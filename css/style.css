@@ -1,0 +1,430 @@
+:root {
+    --pet-font: "Diary", sans-serif;
+    --ui-font: system-ui, -apple-system, "Segoe UI", "Malgun Gothic", sans-serif;
+    --accent: #ff8fab;
+    --accent-dark: #e86f8e;
+    --line: #ececec;
+    --text: #333;
+    --muted: #888;
+}
+
+* {
+    -webkit-tap-highlight-color: transparent;
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #ffffff;
+    min-height: 100vh;
+    overflow: hidden;
+    font-family: var(--ui-font);
+    color: var(--text);
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* ===== 캐릭터 ===== */
+.image-wrapper {
+    position: absolute;
+    display: inline-block;
+    cursor: pointer;
+    touch-action: none;
+    user-select: none;
+}
+
+.image-wrapper.locked {
+    cursor: default;
+}
+
+.image-wrapper.dragging {
+    cursor: grabbing;
+}
+
+.image-wrapper img {
+    width: 260px;
+    height: auto;
+    border-radius: 16px;
+    display: block;
+    transition: opacity 0.2s ease;
+}
+
+/* 말풍선 */
+.click-bubble {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    padding: 12px 18px;
+    border-radius: 20px;
+    font-family: var(--pet-font);
+    font-size: 18px;
+    width: max-content;
+    max-width: 320px;
+    text-align: center;
+    white-space: pre-line;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 2;
+}
+
+.click-bubble::after {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 10px 8px 0 8px;
+    border-style: solid;
+    border-color: white transparent transparent transparent;
+}
+
+/* 캐릭터 옆 미니 타이머/스톱워치 */
+.mini-widget {
+    position: absolute;
+    left: 100%;
+    bottom: 12px;
+    margin-left: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-family: var(--pet-font);
+    font-size: 14px;
+}
+
+.mini-widget div {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 10px;
+    padding: 3px 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.mini-widget .paused {
+    opacity: 0.55;
+}
+
+.mini-widget .done {
+    background: var(--accent);
+    color: white;
+    cursor: pointer;
+}
+
+/* 애니메이션 */
+.pop-character {
+    animation: bubblePop 0.25s ease-out;
+}
+
+@keyframes bubblePop {
+    0% { transform: scale(1); }
+    30% { transform: scale(0.92); }
+    70% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.pop-bubble {
+    animation: bubblePopBubble 0.25s ease-out;
+}
+
+@keyframes bubblePopBubble {
+    0% { transform: translateX(-50%) scale(1); }
+    30% { transform: translateX(-50%) scale(0.92); }
+    70% { transform: translateX(-50%) scale(1.05); }
+    100% { transform: translateX(-50%) scale(1); }
+}
+
+.show {
+    opacity: 1;
+}
+
+/* ===== 우클릭 메뉴 ===== */
+.context-menu {
+    position: fixed;
+    margin: 0;
+    padding: 6px;
+    list-style: none;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+    min-width: 190px;
+    font-size: 14px;
+    z-index: 100;
+    display: none;
+}
+
+.context-menu.open {
+    display: block;
+}
+
+.context-menu li {
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.context-menu li:hover {
+    background: #fff0f4;
+}
+
+.context-menu .divider {
+    height: 1px;
+    padding: 0;
+    margin: 4px 6px;
+    background: var(--line);
+    cursor: default;
+}
+
+.context-menu .hint {
+    color: var(--muted);
+    font-size: 11px;
+    align-self: center;
+}
+
+/* ===== 기능 패널 ===== */
+.panel {
+    position: fixed;
+    width: 300px;
+    max-height: calc(100vh - 20px);
+    overflow-y: auto;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
+    font-size: 14px;
+    z-index: 50;
+    display: none;
+}
+
+.panel.open {
+    display: block;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--line);
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    background: white;
+}
+
+.panel-body {
+    padding: 12px 14px;
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.panel-body.active {
+    display: flex;
+}
+
+.row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.row > input, .row > select {
+    flex: 1;
+    min-width: 0;
+}
+
+.inline-label {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+input, textarea, select {
+    font: inherit;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 7px 9px;
+    outline: none;
+    width: 100%;
+}
+
+input:focus, textarea:focus, select:focus {
+    border-color: var(--accent);
+}
+
+textarea {
+    resize: vertical;
+}
+
+button {
+    font: inherit;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 8px;
+    padding: 7px 11px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+button:hover {
+    background: #f7f7f7;
+}
+
+button.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+}
+
+button.primary:hover {
+    background: var(--accent-dark);
+}
+
+button.danger {
+    color: #d33;
+}
+
+button.wide {
+    width: 100%;
+}
+
+.icon-btn {
+    border: none;
+    background: none;
+    padding: 2px 6px;
+    color: var(--muted);
+}
+
+.note {
+    margin: 0;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 260px;
+    overflow-y: auto;
+}
+
+.list li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 8px;
+    border-radius: 8px;
+    background: #fafafa;
+}
+
+.list li.clickable {
+    cursor: pointer;
+}
+
+.list li.clickable:hover {
+    background: #fff0f4;
+}
+
+.list .text {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.list .sub {
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.list .empty {
+    background: none;
+    color: var(--muted);
+    justify-content: center;
+}
+
+.list li.done .text {
+    text-decoration: line-through;
+    color: var(--muted);
+}
+
+.list input[type="checkbox"] {
+    width: auto;
+}
+
+/* 탭 */
+.tabs {
+    display: flex;
+    gap: 4px;
+    background: #f3f3f3;
+    padding: 3px;
+    border-radius: 10px;
+}
+
+.tab {
+    flex: 1;
+    border: none;
+    background: none;
+}
+
+.tab.active {
+    background: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.tab-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.time-display {
+    text-align: center;
+    font-size: 40px;
+    font-variant-numeric: tabular-nums;
+    padding: 8px 0;
+}
+
+.time-inputs input {
+    text-align: center;
+}
+
+.presets button {
+    flex: 1;
+    font-size: 13px;
+}
+
+.row > button.primary {
+    flex: 1;
+}
+
+/* 알림 토스트 */
+.toast {
+    position: fixed;
+    left: 50%;
+    bottom: 20px;
+    transform: translateX(-50%);
+    background: rgba(40, 40, 40, 0.9);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+    z-index: 200;
+}

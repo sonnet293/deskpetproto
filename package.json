@@ -1,0 +1,9 @@
+{
+  "name": "deskpet",
+  "version": "0.1.0",
+  "private": true,
+  "description": "데스크펫 (로컬 웹 프로토타입, 이후 Electron 이식)",
+  "scripts": {
+    "start": "node server.js"
+  }
+}

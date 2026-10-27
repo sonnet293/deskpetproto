@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+    <title>데스크펫</title>
+</head>
+<body>
+
+    <div class="image-wrapper" id="character">
+        <img src="img/image.png" alt="데스크펫" draggable="false">
+        <div class="click-bubble" id="bubble"></div>
+        <div class="mini-widget" id="mini"></div>
+    </div>
+
+    <!-- 우클릭 메뉴 -->
+    <ul class="context-menu" id="context-menu">
+        <li data-action="clipboard">📋 클립보드 <span class="hint" id="clip-shortcut-hint"></span></li>
+        <li data-action="timer">⏱️ 타이머/스톱워치</li>
+        <li data-action="todo">✅ 일정관리</li>
+        <li data-action="memo">📝 메모장</li>
+        <li class="divider"></li>
+        <li data-action="lock" id="menu-lock">🔒 위치 잠금</li>
+        <li data-action="dashboard">⚙️ 설정</li>
+    </ul>
+
+    <!-- 기능 패널 -->
+    <div class="panel" id="panel">
+        <div class="panel-header">
+            <span id="panel-title"></span>
+            <button class="icon-btn" id="panel-close" title="닫기">✕</button>
+        </div>
+
+        <section class="panel-body" data-panel="clipboard">
+            <div class="row">
+                <input type="text" id="clip-input" placeholder="직접 추가할 내용">
+                <button id="clip-add">추가</button>
+            </div>
+            <button class="wide" id="clip-read">현재 클립보드 가져오기</button>
+            <ul class="list" id="clip-list"></ul>
+            <p class="note">항목을 누르면 클립보드에 복사돼요. 이 창에서 복사(Ctrl+C)한 내용은 자동 저장됩니다.</p>
+        </section>
+
+        <section class="panel-body" data-panel="timer">
+            <div class="tabs">
+                <button class="tab active" data-tab="timer-tab">타이머</button>
+                <button class="tab" data-tab="stopwatch-tab">스톱워치</button>
+            </div>
+            <div class="tab-body" id="timer-tab">
+                <div class="time-display" id="timer-display">05:00</div>
+                <div class="row time-inputs">
+                    <input type="number" id="timer-h" min="0" max="23" placeholder="시">
+                    <input type="number" id="timer-m" min="0" max="59" placeholder="분">
+                    <input type="number" id="timer-s" min="0" max="59" placeholder="초">
+                    <button id="timer-set">설정</button>
+                </div>
+                <div class="row presets">
+                    <button data-min="1">1분</button>
+                    <button data-min="5">5분</button>
+                    <button data-min="10">10분</button>
+                    <button data-min="25">25분</button>
+                </div>
+                <div class="row">
+                    <button class="primary" id="timer-toggle">시작</button>
+                    <button id="timer-reset">초기화</button>
+                </div>
+            </div>
+            <div class="tab-body hidden" id="stopwatch-tab">
+                <div class="time-display" id="sw-display">00:00.00</div>
+                <div class="row">
+                    <button class="primary" id="sw-toggle">시작</button>
+                    <button id="sw-reset">초기화</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel-body" data-panel="todo">
+            <div class="row">
+                <input type="text" id="todo-input" placeholder="오늘 할 일">
+                <button id="todo-add">추가</button>
+            </div>
+            <ul class="list" id="todo-list"></ul>
+            <label class="row inline-label">
+                알림 주기
+                <select id="todo-interval">
+                    <option value="0">끄기</option>
+                    <option value="10">10분</option>
+                    <option value="30">30분</option>
+                    <option value="60">1시간</option>
+                    <option value="180">3시간</option>
+                    <option value="300">5시간</option>
+                </select>
+            </label>
+        </section>
+
+        <section class="panel-body" data-panel="memo">
+            <div id="memo-list-view">
+                <div class="row">
+                    <input type="search" id="memo-search" placeholder="메모 검색">
+                    <button id="memo-new">새 메모</button>
+                </div>
+                <ul class="list" id="memo-list"></ul>
+            </div>
+            <div id="memo-edit-view" class="hidden">
+                <input type="text" id="memo-title" placeholder="제목">
+                <textarea id="memo-content" rows="8" placeholder="내용"></textarea>
+                <div class="row">
+                    <button id="memo-back">목록</button>
+                    <button class="danger" id="memo-delete">삭제</button>
+                    <button class="primary" id="memo-save">저장</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="js/store.js"></script>
+    <script src="js/timer.js"></script>
+    <script src="js/script.js"></script>
+
+</body>
+</html>
